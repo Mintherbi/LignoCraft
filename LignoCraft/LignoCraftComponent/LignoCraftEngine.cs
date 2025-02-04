@@ -5,9 +5,9 @@ using Grasshopper;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-namespace LignoCraft
+namespace LignoCraft.LignoCraftComponent
 {
-    public class BinaryNature : GH_Component
+    public class LignoCraftEngine : GH_Component
     {
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
@@ -16,25 +16,43 @@ namespace LignoCraft
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
-        public BinaryNature()
+        public LignoCraftEngine()
           : base("LignoCraftEngine", "LE",
             "Main Engine for Manipulating GCode and 3D Printer",
             "BinaryNature", "LignoCraft")
         {
         }
 
+        public override void CreateAttributes()
+        {
+            List<object> buttontest = new List<object>();
+            buttontest.Add(new CustomUI.ButtonUIAttributes(this, "A", AFunctionToRunOnClick, "Opt description"));
+            buttontest.Add(new CustomUI.ButtonUIAttributes(this, "B", BFunctionToRunOnClick, "Opt description"));
+        }
+
+        public void AFunctionToRunOnClick()
+        {
+            System.Windows.Forms.MessageBox.Show("A Button was clicked");
+        }
+        public void BFunctionToRunOnClick()
+        {
+            System.Windows.Forms.MessageBox.Show("B Button was clicked");
+        }
         /// <summary>
         /// Registers all the input parameters for this component.
         /// </summary>
-        protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
+        protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
+            pManager.AddGenericParameter("Input1", "I1", "First Input", GH_ParamAccess.item);
+            pManager[0].Optional = true;
         }
 
         /// <summary>
         /// Registers all the output parameters for this component.
         /// </summary>
-        protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
+        protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
+            pManager.AddGenericParameter("Output1", "O1", "First Output", GH_ParamAccess.item);
         }
 
         /// <summary>
