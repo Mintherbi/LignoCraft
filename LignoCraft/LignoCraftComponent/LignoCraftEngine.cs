@@ -38,7 +38,6 @@ namespace LignoCraft.LignoCraftComponent
 
         public void Connect2Device()
         {
-
             SerialPort _serialPort = new SerialPort("COM3", 115200);
             _serialPort.Open();
             _serialPort.Write("?");
@@ -48,11 +47,17 @@ namespace LignoCraft.LignoCraftComponent
             {
                 log.Add(_serialPort.ReadLine());
             }
-            _serialPort.Close();
-            _serialPort.Open();
             _serialPort.Write("$$");
             Thread.Sleep(500);
             log.Add("Connecting...");
+            if (_serialPort.BytesToRead > 0)
+            {
+                log.Add(_serialPort.ReadLine());
+            }
+            _serialPort.Write("$h");
+            _serialPort.Write("G01 F2000");
+            Thread.Sleep(500);
+            log.Add("Homing...");
             if (_serialPort.BytesToRead > 0)
             {
                 log.Add(_serialPort.ReadLine());
@@ -91,6 +96,8 @@ namespace LignoCraft.LignoCraftComponent
             #region ///Set output parameter
             DA.SetDataList(0, log);
             #endregion
+
+            this.ExpireSolution(true);
         }
 
         /// <summary>
