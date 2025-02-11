@@ -59,7 +59,7 @@ namespace CustomUI
                 h0 = 10;
                 SpacerBounds = new RectangleF(Bounds.X, Bounds.Bottom + s / 2, Bounds.Width, h0);
             }
-                
+
             int h1 = 20; // height of button
             // create text box placeholders
             ButtonBounds = new RectangleF(Bounds.X + 2 * s, Bounds.Bottom + h0 + 2 * s, Bounds.Width - 4 * s, h1);

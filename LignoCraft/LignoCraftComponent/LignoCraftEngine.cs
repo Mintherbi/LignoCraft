@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO.Ports;
+using System.Threading;
+using System.Text; 
 
 using Grasshopper;
 using Grasshopper.Kernel;
@@ -9,6 +12,11 @@ namespace LignoCraft.LignoCraftComponent
 {
     public class LignoCraftEngine : GH_Component
     {
+        string Port;
+        int baudRate;
+        bool _continue = true;
+
+        List<string> log = new List<string>();
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
         /// constructor without any arguments.
@@ -25,26 +33,39 @@ namespace LignoCraft.LignoCraftComponent
 
         public override void CreateAttributes()
         {
-            List<object> buttontest = new List<object>();
-            buttontest.Add(new CustomUI.ButtonUIAttributes(this, "A", AFunctionToRunOnClick, "Opt description"));
-            buttontest.Add(new CustomUI.ButtonUIAttributes(this, "B", BFunctionToRunOnClick, "Opt description"));
+            m_attributes = new CustomUI.ButtonUIAttributes(this, "Connect", Connect2Device, "Connect to Device");
         }
 
-        public void AFunctionToRunOnClick()
+        public void Connect2Device()
         {
-            System.Windows.Forms.MessageBox.Show("A Button was clicked");
-        }
-        public void BFunctionToRunOnClick()
-        {
-            System.Windows.Forms.MessageBox.Show("B Button was clicked");
+
+            SerialPort _serialPort = new SerialPort("COM3", 115200);
+            _serialPort.Open();
+            _serialPort.Write("?");
+            Thread.Sleep(500);
+            log.Add("Information");
+            if (_serialPort.BytesToRead > 0)
+            {
+                log.Add(_serialPort.ReadLine());
+            }
+            _serialPort.Close();
+            _serialPort.Open();
+            _serialPort.Write("$$");
+            Thread.Sleep(500);
+            log.Add("Connecting...");
+            if (_serialPort.BytesToRead > 0)
+            {
+                log.Add(_serialPort.ReadLine());
+            }
+            _serialPort.Close();
         }
         /// <summary>
         /// Registers all the input parameters for this component.
         /// </summary>
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("Input1", "I1", "First Input", GH_ParamAccess.item);
-            pManager[0].Optional = true;
+            pManager.AddTextParameter("serialPort", "sP", "Name of the port", GH_ParamAccess.item, "COM3");
+            pManager.AddIntegerParameter("baudRate", "bR", "baudRate", GH_ParamAccess.item, 115200);
         }
 
         /// <summary>
@@ -52,7 +73,7 @@ namespace LignoCraft.LignoCraftComponent
         /// </summary>
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Output1", "O1", "First Output", GH_ParamAccess.item);
+            pManager.AddTextParameter("FeedBack", "FB", "Feedback from device", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -62,6 +83,14 @@ namespace LignoCraft.LignoCraftComponent
         /// to store data in output parameters.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
+            #region ///Set input parameter
+            if(!DA.GetData(0, ref Port)) { return; }
+            if(!DA.GetData(1, ref baudRate)) { return; }
+            #endregion
+
+            #region ///Set output parameter
+            DA.SetDataList(0, log);
+            #endregion
         }
 
         /// <summary>

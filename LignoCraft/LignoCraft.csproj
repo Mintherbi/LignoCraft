@@ -24,6 +24,7 @@
   
   <ItemGroup>
     <PackageReference Include="Grasshopper" Version="8.0.23304.9001" ExcludeAssets="runtime" />
+    <PackageReference Include="System.IO.Ports" Version="9.0.1" />
   </ItemGroup>
   
   <!-- For Windows only builds -->
